@@ -24,7 +24,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 browser= webdriver.Chrome(ChromeDriverManager().install())
 # ['https://weaver-at-work.com/ss/index.php','https://www1.micard.co.jp.macys15.tokyo/404.html','https://esterlinbhaiacharicpt.revisewaves.online/gv2.php',https://www-kraken-logins-ie.com/sign-in/home.html?hash=0.177023797851']
-urls11='https://www.teamlease.com/?src=alert_mail_new'
+urls11='https://www.teamlease.com/?src=alert_mail_new'#https://234.17681.1881
 browser.get(urls11)
 urls1=browser.current_url
 # urls1='https://www-kraken-logins-ie.com/sign-in/home.html?hash=0.177023797851'
@@ -377,7 +377,7 @@ def url_google_index(urls_value):#87,88
         text = element.get_attribute("innerHTML")
         pprint(text)
         # AUG\|(.*?)\|UGA
-        
+        #About 7,82,00,00,000 results<nobr> (0.60 seconds)&nbsp;</nobr>
         if 'About' in text:
             result=re.search('%s(.*)%s' % ('About ', ' results'), text).group(1)
             
@@ -385,7 +385,7 @@ def url_google_index(urls_value):#87,88
             result =re.findall('(.*?)%s'%('result|results'),text)[0]
             
         #     print('result',result)
-        if int(result.replace(",",""))>0:
+        if int(result.replace(",",""))>0:#7820000000
             print(result,' founddddddddddddddddddddddddddddddd')
             
         else:

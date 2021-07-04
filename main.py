@@ -68,8 +68,8 @@ def email_url_check():
 @app.route('/Manual_urlCheck',methods=['GET','POST'])
 def Manual_urlCheck():
     urls1=request.form.get("url1")
-    browser.get(urls1)
-    urls11=browser.current_url
+    # browser.get(urls1)
+    urls11=urls1
     print("***************************current url************************",urls1)
     # urls=browser.current_url
     urls=urls1
@@ -88,7 +88,7 @@ def Manual_urlCheck():
         # query_string1=a1.query
         print("inside else")
         output=''
-        file_name=os.path.basename(a.path)
+        file_name=os.path.basename(a.path)#/aaaa/aaa/aaaaq.html
         # file_name1=os.path.basename(a1.path)
         directory=os.path.dirname(a.path[1:])
         # directoru1=os.path.dirname(a1.path[1:])
@@ -201,7 +201,7 @@ def Manual_urlCheck():
             feature_obtained.append(UrlDivision.number_of_params(query_string))
         feature_obtained.append(UrlDivision.mail_id_check(mails_list))
         print("feature1")
-        feature_obtained.extend(UrlDivision.services(hostname,ip_address1,a1_netloc))#4
+        feature_obtained.extend(UrlDivision.services(hostname,ip_address1,a1_netloc))#4,[1,1,2,3]=4 4
         print("feature2")
         feature_obtained.append(UrlDivision.dns_resolver(a1_netloc))
         print("feature3 ")
@@ -257,7 +257,7 @@ def email_url_startCheck():
             for row in csv_dict_reader:
                 user=checker(row['FROM'],row['SUBJECT'],row['LINK'])
                 if user=='phish':
-                    data_list.append([row['FROM'],row['SUBJECT'],row['LINK'],1])
+                    data_list.append([row['FROM'],row['SUBJECT'],row['LINK'],1])#[[],[],[]]
                     # print("*******************row data***********************",row['FROM'],row['SUBJECT'],row['LINK'],1)
                     # writer1.writerow([row['FROM'],row['SUBJECT'],row['LINK'],1])
                     # print("****************************url result*************************=",user)
@@ -280,6 +280,7 @@ def checker(From,subject,link):
     output=''
     if match:
         print('tiny url')
+        
     else:
         a=urlparse(urls1)
         a_netloc=(a.netloc.split(':'))[0]
