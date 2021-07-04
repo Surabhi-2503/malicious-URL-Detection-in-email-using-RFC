@@ -15,13 +15,20 @@ import dns.resolver
 import whois
 from selenium import webdriver   # for webdriver
 from selenium.webdriver.support.ui import WebDriverWait  # for implicit and explict waits
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options  # for suppressing the browser
 import pandas as pd
 import numpy as np
 from pprint import pprint
 tld_list=['org','com','net','edu','info','co','biz','io','gov','in']
-
-
+# option = webdriver.ChromeOptions()
+chrome_options = Options()
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--ignore-certificate-errors')
+chrome_options.add_argument('--headless')
+chrome_options.add_argument('--disable-dev-shm-usage')
+# browser= webdriver.Chrome('E:/OnDownload/chromedriver_win32/chromedriver.exe')
+browser=webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
 # ********************complete url********************
 def qty_dots(urls):#1
     return urls.count('.')
@@ -53,13 +60,18 @@ def qty_percent(urls):# No of percent in URL 14
     return (urls.count('%'))
 def qty_tld(network_locality):# No of tld in URL 15
     tlds=[]
+    
     try:
         tlds=list(get_tld(network_locality, fix_protocol=True).split('.'))
     except:
-        s=socket.gethostbyaddr(network_locality)
-        tlds=list(get_tld(s[0],fix_protocol=True).split('.'))
+        try:
+            s=socket.gethostbyaddr(network_locality)
+            # print('address=',s)
+            tlds=list(get_tld(s[0],fix_protocol=True).split('.'))
+        except:
+            return -1
 
-        
+    # print('tlds=',tlds)
     return (len(tlds))
 #16th attribute length
 #***************************DOMAIN*********************************
@@ -73,10 +85,11 @@ def qty_vowels_domain(domains):#22,23
         if i1 in ['a','e','i','o','u','A','E','I','O','U']:
             count+=1
     return (count)
-    return (len(domains)-1)
+    # return (len(domains)-1)
 def domain_in_ip(a_netloc):
     try:
         if socket.gethostbyname(a_netloc)==a_netloc:
+            # print('domain in ip=',socket.gethostbyname(a_netloc))
             return (1)
         else:
             return (0)
@@ -187,6 +200,7 @@ def qty_param_length(params):
 def tld_in_params(params):
     try:
         tld_contains = any(tlds in params for tlds in tld_list)
+        # print('tld_conbtains=',tld_contains)
         return (1)
     except:
         return (0)
@@ -204,13 +218,16 @@ def services(hostname,ip_address,a_netloc):
     try:#78
         response = requests.get(hostname)
         lists=str(response.elapsed).split(':') 
+        # print('response list=',lists)
         features.append(float(lists[2][1:]))
     except:
         features.append(-1)
 
     try:#79
         obj = IPWhois(ip_address)
+        pprint('who_is=',obj)
         res=obj.lookup_whois()
+        pprint('who_is_res=',res)
         features.append(int(res['asn']))
     except:
         features.append(-1)
@@ -221,13 +238,17 @@ def services(hostname,ip_address,a_netloc):
         if (isinstance(whois_info.expiration_date,list)):
             exp_date=whois_info.expiration_date[0]
             expiration_time=whois_info.expiration_date[0]-now
+            # print('expiration=',expiration_time)
         else:
             exp_date=whois_info.expiration_date
             expiration_time=whois_info.expiration_date-now
+            # print('expiration_else=',expiration_time)
         if (isinstance(whois_info.creation_date,list)):
             activation_time= exp_date-whois_info.creation_date[0]
+            # print('activation',activation_time)
         else:
             activation_time= exp_date-(whois_info.creation_date)
+            # print('activation_else=',activation_time)
         if(activation_time.days>=365):
             features.append(activation_time.days)#80
         else:
@@ -244,18 +265,23 @@ def services(hostname,ip_address,a_netloc):
 def dns_resolver(a_netloc):#82
     try:
         ans=dns.resolver.resolve(a_netloc)
+        # print('dns_resolver=',ans)
         lis=[i for i in ans]
+        # print('dns_res_lis=',lis)
         return (len(lis)) 
     except:
         return (-1)   
 def qty_nameservers(a_netloc):#83
     try:
+        # print('name_server=',whois.whois(a_netloc).name_servers)
         return (len(whois.whois(a_netloc).name_servers))
     except:
         return (-1)
 def qty_mx_server(a_netloc):#84
     domains=(a_netloc).replace("www.","")
+    
     try:
+        # print('max_servers=',len(dns.resolver.resolve(domains, 'MX')))
         return (len(dns.resolver.resolve(domains, 'MX')))
     except:
         return (0)
@@ -263,9 +289,20 @@ def qty_ttl(a_netloc):#85
     answer=0
     try:
         answer = dns.resolver.resolve(a_netloc)
+        # print('amswers=',answer)
+        # print('ttl=',answer.rrset.ttl)
     except:
-        s=socket.gethostbyaddr(a_netloc)
-        answer=dns.resolver.resolve(s[0])
+        try:
+            s=socket.gethostbyaddr(a_netloc)
+            answer=dns.resolver.resolve(s[0])
+            # print('ttl_except=',answer)
+        except:
+            try:
+                answer=dns.resolver.resolve((a_netloc.split(':'))[0])
+            except:
+                return -1
+            
+            
     return (answer.rrset.ttl)
 def tls_ssl_certificate(base_url):#86
     try:
@@ -282,23 +319,43 @@ def tls_ssl_certificate(base_url):#86
                     return (0)
     except:
         return (-1)
-def url_or_domain__google_index(urls_value):#87,88
+def url_google_index(urls_value):#87,88
     # print('google indexing')
     try:
-        matched_elements = browser.get("https://www.google.com/search?q=site:" +urls_value+ "&start=" + str(1))
-        results = browser.find_elements_by_id('result-stats')
+        l=['result','<nobr>','&nbsp']
+        browser.get(urls_value)
+        url_value=browser.current_url
+        matched_elements = browser.get("https://www.google.com/search?q=site:" +url_value)
+        print('index_matched=',matched_elements)
         element=browser.find_element_by_xpath('//div[@id ="result-stats"]')
         text = element.get_attribute('innerHTML')
-        if 'about' in text:
-            result=re.search('%s(.*)%s' % ('of about ', ' results'), text).group(1)
+        if 'About' in text:
+            result=re.search('%s(.*)%s' % ('About ', ' results'), text).group(1)
         else:
-            result = re.search('%s(.*)%s' % ('of ', ' results'), text).group(1)
+            result =re.findall('(.*?)%s'%('result|results'),text)[0]
+        print('result=',result)
+        if int(result.replace(",",""))>0:
+            return (1)
+        else:
+            return (0)
+    except:
+        return (-1)
+def domain_google_index(a_netloc):
+    try:
+        matched_elements = browser.get("https://www.google.com/search?q=site:" +a_netloc)
+        element=browser.find_element_by_xpath('//div[@id ="result-stats"]')
+        text = element.get_attribute("innerHTML")
+        if 'About' in text:
+            result=re.search('%s(.*)%s' % ('About ', ' results'), text).group(1)
+        else:
+            result =re.findall('(.*?)%s'%('result|results'),text)[0]
         if int(result.replace(",",""))>0:
             return (1)
         else:
             return (-1)
+        print('result in gg=',result)
     except:
-        return (0)
+        return(0)
 
 if __name__ == '__main__':
     qty_dots(urls)
@@ -378,7 +435,8 @@ if __name__ == '__main__':
     qty_mx_server(a_netloc)#84
     qty_ttl(a_netloc)#85
     tls_ssl_certificate(base_url)#86
-    url_or_domain__google_index(urls_value)#87,88
+    url_google_index(urls_value)#87,88
+    domain_google_index(a_netloc)
     
 
 

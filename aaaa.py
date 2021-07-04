@@ -18,9 +18,17 @@ from selenium.webdriver.chrome.options import Options  # for suppressing the bro
 import pandas as pd
 import numpy as np
 from pprint import pprint
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+
+browser= webdriver.Chrome(ChromeDriverManager().install())
 # ['https://weaver-at-work.com/ss/index.php','https://www1.micard.co.jp.macys15.tokyo/404.html','https://esterlinbhaiacharicpt.revisewaves.online/gv2.php',https://www-kraken-logins-ie.com/sign-in/home.html?hash=0.177023797851']
-urls1='http://www.refifolhairlossprotocol.us/?ijakhcgfekbd=ZURvZGlSak9WQ2dmSC'
-urls=urls1
+urls11='https://www.teamlease.com/?src=alert_mail_new'
+browser.get(urls11)
+urls1=browser.current_url
+# urls1='https://www-kraken-logins-ie.com/sign-in/home.html?hash=0.177023797851'
+urls=browser.current_url
 a=urlparse(urls1)
 # a=urlparse(urlexpander.expand(urls))
 print(a)
@@ -40,9 +48,14 @@ val='' #to remove if any space present in list while finding the certifiation ex
 # for checking google index
 search_string =urls1
 search_string = search_string.replace(' ', '+') 
-option = webdriver.ChromeOptions()
-option.add_argument('headless')
-browser= webdriver.Chrome('E:/OnDownload/chromedriver_win32/chromedriver.exe',options=option)#driver
+print(search_string,"           and        ",a.netloc)
+# chrome_options = Options()
+# chrome_options.add_argument('--no-sandbox')
+# chrome_options.add_argument('--ignore-certificate-errors')
+# chrome_options.add_argument('--headless')
+# chrome_options.add_argument('--disable-dev-shm-usage')
+# browser= webdriver.Chrome(ChromeDriverManager().install())
+# browser=webdriver.Chrome(ChromeDriverManager().install(),options=chrome_options)
 #end of selenium driver load
 hostname = a.scheme+'://'+base_url
 context = ssl.create_default_context()
@@ -305,8 +318,8 @@ def services():
     qty_mx_server()
     qty_ttl()
     tls_ssl_certificate()
-    url_or_domain__google_index(search_string)
-    url_or_domain__google_index(a.netloc)
+    url_google_index(search_string)
+    domain_google_index(a.netloc)
     url_shortened()
 def dns_resolver():#82
     try:
@@ -344,23 +357,70 @@ def tls_ssl_certificate():#86
                     feature_obtained.append(0)
     except:
         feature_obtained.append(-1)
-def url_or_domain__google_index(urls_value):#87,88
-    # print('google indexing')
+def url_google_index(urls_value):#87,88
+    print('url google indexing=',urls_value)
     try:
-        matched_elements = browser.get("https://www.google.com/search?q=site:" +urls_value+ "&start=" + str(1))
+        # l=['result','<nobr>','&nbsp','</nobr>']
+        
+        # wait = WebDriverWait(browser, 10)
+        # wait.until(lambda driver: driver.current_url != urls_value)
+        browser.get(urls_value)
+       
+        url_value=browser.current_url
+        print('redirection:',url_value)
+        matched_elements = browser.get("https://www.google.com/search?q=site:" +url_value)
+        print('matched=',matched_elements)
         results = browser.find_elements_by_id('result-stats')
+        print('results=',results)
         element=browser.find_element_by_xpath('//div[@id ="result-stats"]')
-        text = element.get_attribute('innerHTML')
-        if 'about' in text:
-            result=re.search('%s(.*)%s' % ('of about ', ' results'), text).group(1)
+        print('element=',element)
+        text = element.get_attribute("innerHTML")
+        pprint(text)
+        # AUG\|(.*?)\|UGA
+        
+        if 'About' in text:
+            result=re.search('%s(.*)%s' % ('About ', ' results'), text).group(1)
+            
         else:
-            result = re.search('%s(.*)%s' % ('of ', ' results'), text).group(1)
+            result =re.findall('(.*?)%s'%('result|results'),text)[0]
+            
+        #     print('result',result)
         if int(result.replace(",",""))>0:
-            feature_obtained.append(1)
+            print(result,' founddddddddddddddddddddddddddddddd')
+            
         else:
-            feature_obtained.append(-1)
+            print('not foundsssssssssssssssssssssssssssssssssssssss')
+            
     except:
-	    feature_obtained.append(0)
+        print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
+def domain_google_index(a_netloc):
+    print('url google indexing=',a_netloc)
+    try:
+        # l=['result','<nobr>','&nbsp']
+        print('redirection:',a_netloc)
+        matched_elements = browser.get("https://www.google.com/search?q=site:" +a_netloc)
+        print('matched=',matched_elements)
+        results = browser.find_elements_by_id('result-stats')
+        print('results=',results)
+        element=browser.find_element_by_xpath('//div[@id ="result-stats"]')
+        print('element=',element)
+        text = element.get_attribute("innerHTML")
+        text1='1,233,111 results'
+        # AUG\|(.*?)\|UGA
+        # print('text=',re.findall('(.*?)%s'%('result|results'),text1)[0])
+        if 'About' in text:
+            result=re.search('%s(.*)%s' % ('About ', ' results'), text).group(1)
+        else:
+            result =re.findall('(.*?)%s'%('result|results'),text1)[0]
+        #     print('result',result)
+        if int(result.replace(",",""))>0:
+            print(result,' founddddddddddddddddddddddddddddddd')
+            
+        else:
+            print('not foundsssssssssssssssssssssssssssssssssssssss')
+            
+    except:
+        print('errorrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
 
 def url_shortened():
     match=re.search(shortening_services,urls1)
@@ -389,11 +449,6 @@ if __name__ == '__main__':
         qty_params(query_string)
     mail_id_check()
     services()
-    print(feature_obtained)
+    # print(feature_obtained)
     # print(len(feature_obtained))
-    model=pickle.load(open('model1.pkl', 'rb'))
-    feature_dataframe = pd.DataFrame(feature_obtained)
-    if (model.predict([feature_obtained]))==[0]:
-        print('safer')
-    else:
-        print('phished')
+    

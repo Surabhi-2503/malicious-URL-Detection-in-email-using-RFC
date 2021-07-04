@@ -122,48 +122,25 @@
 						<div class="col-md-12">
               <!-- form -->
 							<form action="{{ url_for('email_urlCheck')}}"  method="post" class="mt-5">
-								<!-- <div class="form-row"> -->
-								    <div class="col-md-12 form-group">
-                                        <label>USERNAME:</label>
-									    <input type="text" class="form-control" id="username" name="username" placeholder="Enter the username"/>
-                                    </div>
-                                    <div class="col-md-12 form-group">
-                                        <label>EMAIL_ID</label>
-                                        <input type="email" class="form-control" id="email_id" name="email_id" placeholder="Enter your email id"/>
-                                    </div>
-                                    <div class="col-md-12 form-group">
-                                        <label>PASSWORD:</label>
-                                        <input type="password" class="form-control" id="passwd" name="passwd" placeholder="Enter your email password"/>
-                                    </div>
-                                    <br><br><button class="subscribe btn btn-primary btn-block shadow-sm" type="submit">Check</button>
-								  <!-- </div> -->
-								<!-- </div> -->
+								<div class="col-md-12 form-group">
+                  <label>USERNAME:</label>
+									<input type="text" class="form-control" id="username" name="username" placeholder="Enter the username"/>
+                </div>
+                <div class="col-md-12 form-group">
+                  <label>EMAIL_ID</label>
+                  <input type="email" class="form-control" id="email_id" name="email_id" placeholder="Enter your email id"/>
+                </div>
+                <div class="col-md-12 form-group">
+                  <label>PASSWORD:</label>
+                  <input type="password" class="form-control" id="passwd" name="passwd" placeholder="Enter your email password"/>
+                </div>
+                <br><br><button class="subscribe btn btn-primary btn-block shadow-sm" type="submit">Check</button>
 							</form>
 						</div>
-						<div class="col-md-12">
-							{% if result == 'safer' %}
-								<div class="container-fluid">
-									<div class="cookiesContent" id="cookiesPopup">
-							  			<button class="close">&#10004</button>
-							  				<img class="alerts" src="https://i.dlpng.com/static/png/6419318_preview.png" alt="cookies-img" />
-							  				<p class="sus">Carry on with your process.Entered URL appears tro be safer....!!</p>
-							  					<!-- <p>{{result}}</p> -->
-									</div>
-								</div>
-							{%elif result=='phished' %} 
-								<div class="container-fluid">
-									<div class="cookiesContent" id="cookiesPopup">
-							  			<button class="close">✖</button>
-							  			<img class="alerts" src="https://cdn3.iconfinder.com/data/icons/basicolor-signs-warnings/24/182_warning_notice_error-512.png" alt="cookies-img" />
-							  			<p class="sus">WARNING : Entered URL appears to be <b>suspecious</b>....!!</p>
-							 			 <!-- <p>{{result}}</p> -->
-									</div>
-								</div>
-							{%endif%}
-						</div>
+						<div class="col-md-12"></div>
 					</div>	
 				</div>
-					<!-- ====================================== -->
+					<!-- ====================safer image================== -->
 				<div class="col-md-6">
 						<img src="{{ url_for('static',filename='safe.svg')}}">
 				</div>
@@ -191,7 +168,7 @@
       </div>
     </section><!-- End Cta Section -->
 	<!-- ======= Pricing Section ======= -->
-    <section id="pricing" class="pricing">
+     <section id="pricing" class="pricing">
       <div class="container">
 
         <div class="section-title" data-aos="zoom-out">
@@ -223,13 +200,13 @@
               <h3>Email Check</h3>
               <p>Click the below link to scan your emails</p>
               <div class="btn-wrap">
-                <a href="{{url_for('email_url_check')}}" class="btn-buy">Check now</a>
+                <a href="{{url_for('email_url_check')}}" class="btn-buy">Click here</a>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </section><!-- End Pricing Section -->
+    </section>
 
     <!-- ======= Contact Section ======= -->
     <section id="contact" class="contact">
